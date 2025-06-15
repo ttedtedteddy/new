@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN || "r8_eGYbNhPuO1569X9nyV3O8m06GSNRUos4J1Q87";
+  const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN || 'r8_eGYbNhPuO1569X9nyV3O8m06GSNRUos4J1Q87';
 
   if (req.method === 'POST') {
     try {
