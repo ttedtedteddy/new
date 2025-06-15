@@ -15,8 +15,12 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('.'));
 
-// Replicate API 키 (환경변수에서 가져오기)
-const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN;
+// Replicate API 키 (환경변수에서만 가져오기)
+const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN || "r8_eGYbNhPuO1569X9nyV3O8m06GSNRUos4J1Q87";
+if (!REPLICATE_API_TOKEN) {
+  console.error('❌ REPLICATE_API_TOKEN 환경변수가 설정되지 않았습니다.');
+  process.exit(1);
+}
 
 // Cloudinary 환경설정
 cloudinary.config({
@@ -95,13 +99,6 @@ app.post('/upload', async (req, res) => {
 // Replicate API 호출 엔드포인트
 app.post('/replicate', async (req, res) => {
   try {
-    if (!REPLICATE_API_TOKEN || REPLICATE_API_TOKEN === 'your-replicate-api-token-here') {
-      return res.status(500).json({ 
-        error: 'Replicate API 토큰이 설정되지 않았습니다.',
-        details: 'REPLICATE_API_TOKEN 환경변수를 설정해주세요.'
-      });
-    }
-
     // 2초 대기 (안정성을 위해)
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -129,13 +126,6 @@ app.post('/replicate', async (req, res) => {
 // Replicate 결과 polling 엔드포인트
 app.get('/replicate/:id', async (req, res) => {
   try {
-    if (!REPLICATE_API_TOKEN || REPLICATE_API_TOKEN === 'your-replicate-api-token-here') {
-      return res.status(500).json({ 
-        error: 'Replicate API 토큰이 설정되지 않았습니다.',
-        details: 'REPLICATE_API_TOKEN 환경변수를 설정해주세요.'
-      });
-    }
-
     const response = await fetch(`https://api.replicate.com/v1/predictions/${req.params.id}`, {
       headers: {
         'Authorization': `Token ${REPLICATE_API_TOKEN}`
@@ -174,14 +164,7 @@ app.listen(PORT, () => {
   console.log('🚀 AI Fitting Studio 서버가 포트', PORT, '에서 실행 중입니다.');
   console.log('📱 브라우저에서 http://localhost:' + PORT + ' 를 열어보세요.');
   
-  if (!REPLICATE_API_TOKEN || REPLICATE_API_TOKEN === 'your-replicate-api-token-here') {
-    console.log('⚠️  REPLICATE_API_TOKEN 환경변수를 설정해주세요.');
-    console.log('   1. env.example 파일을 .env로 복사하세요');
-    console.log('   2. .env 파일에서 REPLICATE_API_TOKEN을 실제 토큰으로 변경하세요');
-    console.log('   3. Replicate 토큰은 https://replicate.com/account/api-tokens 에서 발급받을 수 있습니다');
-  } else {
-    console.log('✅ Replicate API 토큰이 설정되었습니다.');
-  }
+  console.log('✅ Replicate API 토큰이 설정되었습니다.');
   
   console.log('✅ Cloudinary가 설정되었습니다.');
 }); 
